@@ -19,12 +19,13 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @GetMapping("/search")
-    public String searchBooks(@RequestParam String query) {
+    @GetMapping("/populate")
+    public String populatePorGenero() {
         try {
-            return bookService.searchBooks(query);
+            var livros = bookService.populatePorGenero();
+            return livros.size() + " livros salvos com sucesso por gênero.";
         } catch (Exception e) {
-            return "Error: " + e.getMessage();
+            return "Erro ao popular livros: " + e.getMessage();
         }
     }
 }

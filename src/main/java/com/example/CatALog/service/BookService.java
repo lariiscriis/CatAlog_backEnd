@@ -1,34 +1,74 @@
 package com.example.CatALog.service;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
+import com.example.CatALog.domain.user.Livro;
+import com.example.CatALog.dto.LivroDTO;
+import com.example.CatALog.repositories.BookRepository;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class BookService {
 
-    private static final String API_KEY = "AIzaSyAxgTPQuPWbwD0qg0lKK1-qHV2PMKjLjLk";
+    private final BookRepository bookRepository;
+    private final Gson gson = new Gson();
 
-    public String searchBooks(String query) throws IOException, InterruptedException {
-
-        String encodeQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
-        String url = "https://www.googleapis.com/books/v1/volumes?q=" + encodeQuery
-                + "&maxResults=20&langRestrict=en&key=" + API_KEY;
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
-
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
     }
 
+    public List<Livro> populatePorGenero() throws IOException, InterruptedException {
+        List<String> generos = List.of("fantasy", "romance", "science fiction", "history", "biography");
+        List<Livro> todos = new ArrayList<>();
+
+        for (String genero : generos) {
+            System.out.println("Importando: " + genero);
+            todos.addAll(populateBooksBySubject(genero));
+        }
+        return todos;
+    }
+
+    public List<Livro> populateBooksBySubject(String genero) throws IOException, InterruptedException {
+        JsonObject resposta = ConsomeAPI.buscarLivrosPorGenero(genero);
+        JsonArray items = resposta.getAsJsonArray("items");
+
+        List<Livro> livros = new ArrayList<>();
+
+        if (items != null) {
+            for (JsonElement elemento : items) {
+                LivroDTO dto = gson.fromJson(elemento, LivroDTO.class);
+                Livro livro = new Livro();
+
+                livro.setTitulo(dto.volumeInfo.title);
+                livro.setAutores(dto.volumeInfo.authors != null ? String.join(", ", dto.volumeInfo.authors) : "Desconhecido");
+                livro.setEditora(dto.volumeInfo.publisher);
+                livro.setData_publicacao(dto.volumeInfo.publishedDate);
+                livro.setDescricao(dto.volumeInfo.description);
+                livro.setCapa(dto.volumeInfo.imageLinks != null ? dto.volumeInfo.imageLinks.thumbnail : null);
+                livro.setDisponibilidade(true);
+                livro.setNumeroPaginas(dto.volumeInfo.pageCount);
+                livro.setCategoria(genero);
+
+                if (dto.volumeInfo.industryIdentifiers != null) {
+                    dto.volumeInfo.industryIdentifiers.stream()
+                        .filter(id -> id.type.equalsIgnoreCase("ISBN_13"))
+                        .findFirst()
+                        .ifPresent(isbn -> livro.setIsbn(isbn.identifier));
+                }
+
+                if (bookRepository.findByTitulo(livro.getTitulo()).isEmpty()) {
+                    livros.add(bookRepository.save(livro));
+                }
+            }
+        }
+
+        return livros;
+    }
 }
