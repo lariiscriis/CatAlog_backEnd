@@ -31,14 +31,22 @@ public class EmprestimoService {
         livro.realizarEmprestimo();
         bookRepository.save(livro);
 
-        emprestimo.setDataEmprestimo(LocalDateTime.now());
-        emprestimo.setDataPrevistaDevolucao(LocalDateTime.now().plusDays(7));
+        // Se dataEmprestimo vier null, usa agora
+        if (emprestimo.getDataEmprestimo() == null) {
+            emprestimo.setDataEmprestimo(LocalDateTime.now());
+        }
+        // Se dataPrevistaDevolucao vier null, calcula 7 dias após dataEmprestimo
+        if (emprestimo.getDataPrevistaDevolucao() == null) {
+            emprestimo.setDataPrevistaDevolucao(emprestimo.getDataEmprestimo().plusDays(7));
+        }
+
         emprestimo.setEstado(Emprestimo.EstadoEmprestimo.EM_ANDAMENTO);
         emprestimo.setRenovacoes(0);
         emprestimo.setMulta(BigDecimal.ZERO);
 
         return emprestimoRepository.save(emprestimo);
     }
+
 
     @Transactional
     public void renovarEmprestimo(Long idEmprestimo) {
