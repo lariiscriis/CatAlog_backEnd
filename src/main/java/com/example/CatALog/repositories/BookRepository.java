@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Livro, String> {
 
     Optional<Livro> findByTitulo(String titulo);
-
 }

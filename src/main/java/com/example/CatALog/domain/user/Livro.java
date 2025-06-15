@@ -42,5 +42,42 @@ public class Livro {
     @Column(length = 255)
     private String categoria;
 
+
+// Metodos da classe
+
+    public void realizarEmprestimo() {
+        if (qtdeLivro <= 0 || !disponibilidade) {
+            throw new RuntimeException("Livro indisponível para empréstimo");
+        }
+        qtdeLivro--;
+        if (qtdeLivro == 0) {
+            disponibilidade = false;
+        }
+    }
+
+    public void devolverLivro() {
+        qtdeLivro++;
+        if (qtdeLivro > 0) {
+            disponibilidade = true;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Livro{" +
+            "id_livro='" + id_livro + '\'' +
+            ", isbn='" + isbn + '\'' +
+            ", titulo='" + titulo + '\'' +
+            ", editora='" + editora + '\'' +
+            ", data_publicacao='" + data_publicacao + '\'' +
+            ", autores='" + autores + '\'' +
+            ", descricao='" + descricao + '\'' +
+            ", capa='" + capa + '\'' +
+            ", qtdeLivro=" + qtdeLivro +
+            ", disponibilidade=" + disponibilidade +
+            ", numeroPaginas=" + numeroPaginas +
+            ", categoria='" + categoria + '\'' +
+            '}';
+    }
 }
 
