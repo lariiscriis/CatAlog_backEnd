@@ -18,7 +18,7 @@ public class ConsomeAPI {
     public static JsonObject buscarLivrosPorGenero(String genero) throws IOException, InterruptedException {
         String encodedGenero = URLEncoder.encode(genero, StandardCharsets.UTF_8);
         String url = "https://www.googleapis.com/books/v1/volumes?q=subject:" + encodedGenero
-            + "&maxResults=40&orderBy=relevance&key=" + API_KEY;
+            + "&maxResults=40&langRestrict=pt&orderBy=relevance&key=" + API_KEY;
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();

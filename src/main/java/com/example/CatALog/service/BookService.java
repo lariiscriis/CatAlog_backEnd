@@ -52,6 +52,7 @@ public class BookService {
                 livro.setData_publicacao(dto.volumeInfo.publishedDate);
                 livro.setDescricao(dto.volumeInfo.description);
                 livro.setCapa(dto.volumeInfo.imageLinks != null ? dto.volumeInfo.imageLinks.thumbnail : null);
+                livro.setQtdeLivro(1);
                 livro.setDisponibilidade(true);
                 livro.setNumeroPaginas(dto.volumeInfo.pageCount);
                 livro.setCategoria(genero);

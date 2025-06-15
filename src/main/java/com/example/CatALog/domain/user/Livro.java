@@ -33,6 +33,8 @@ public class Livro {
 
     private String capa;
 
+    private int qtdeLivro;
+
     private Boolean disponibilidade;
 
     private int numeroPaginas;
