@@ -23,16 +23,27 @@ public class SecurityFilter extends OncePerRequestFilter {//filtro que sera exec
     UserRepository userRepository;
 
     @Override //metodo do filtro
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        if (path.startsWith("/auth") || path.startsWith("/api/books")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         var token = this.recoverToken(request);
         var login = tokenService.validateToken(token);
 
-        if(login != null){
-            User user = userRepository.findByEmail(login).orElseThrow(() -> new RuntimeException("User Not Found"));
+        if (login != null) {
+            User user = userRepository.findByEmail(login)
+                    .orElseThrow(() -> new RuntimeException("User Not Found"));
             var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
             var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         filterChain.doFilter(request, response);
     }
 

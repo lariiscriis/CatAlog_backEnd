@@ -71,4 +71,30 @@ public class BookService {
 
         return livros;
     }
+
+    public List<LivroDTO> listarTodosLivros() {
+        List<Livro> livros = bookRepository.findAll();
+        List<LivroDTO> dtos = new ArrayList<>();
+
+        for (Livro livro : livros) {
+            LivroDTO dto = new LivroDTO();
+            dto.id = String.valueOf(livro.getId_livro());
+
+            LivroDTO.VolumeInfo volumeInfo = new LivroDTO.VolumeInfo();
+            volumeInfo.title = livro.getTitulo();
+            volumeInfo.authors = List.of(livro.getAutores().split(",\\s*"));
+            volumeInfo.description = livro.getDescricao();
+
+            LivroDTO.ImageLinks imageLinks = new LivroDTO.ImageLinks();
+            imageLinks.thumbnail = livro.getCapa();
+            volumeInfo.imageLinks = imageLinks;
+
+            dto.volumeInfo = volumeInfo;
+
+            dtos.add(dto);
+        }
+
+        return dtos;
+    }
+
 }
