@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()//dizendo que esses endpoints não precisam de verficicação
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers("/api/books/search").permitAll()
+                        .requestMatchers("/api/books/**").permitAll()
                         .anyRequest().authenticated()//e dizendo que qualquer outra requisição a não ser login e register precisa de autenticação
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);//adicionao filtro do security filter pra pegar e validar o token do usuario para ser logado
