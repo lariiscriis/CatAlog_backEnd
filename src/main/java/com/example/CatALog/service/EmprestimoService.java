@@ -1,13 +1,18 @@
 package com.example.CatALog.service;
 import com.example.CatALog.domain.user.Emprestimo;
+import com.example.CatALog.domain.user.Estante;
 import com.example.CatALog.domain.user.Livro;
 import com.example.CatALog.repositories.BookRepository;
 import com.example.CatALog.repositories.EmprestimoRepository;
+import com.example.CatALog.repositories.EstanteRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.CatALog.domain.user.Emprestimo.EstadoEmprestimo.EM_ANDAMENTO;
@@ -17,11 +22,16 @@ public class EmprestimoService {
 
     private final EmprestimoRepository emprestimoRepository;
     private final BookRepository bookRepository;
+    private final NotificacaoService notificacaoService;
+    private final EstanteRepository estanteRepository;
 
-    public EmprestimoService(EmprestimoRepository emprestimoRepository, BookRepository bookRepository) {
+    public EmprestimoService(EmprestimoRepository emprestimoRepository, BookRepository bookRepository,NotificacaoService notificacaoService,EstanteRepository estanteRepository) {
         this.emprestimoRepository = emprestimoRepository;
         this.bookRepository = bookRepository;
+        this.notificacaoService = notificacaoService;
+        this.estanteRepository = estanteRepository;
     }
+
 
     @Transactional
     public Emprestimo realizarEmprestimo(Emprestimo emprestimo) {
@@ -43,6 +53,11 @@ public class EmprestimoService {
         emprestimo.setEstado(Emprestimo.EstadoEmprestimo.EM_ANDAMENTO);
         emprestimo.setRenovacoes(0);
         emprestimo.setMulta(BigDecimal.ZERO);
+        notificacaoService.notificar(
+            emprestimo.getId(),
+            emprestimo.getIdLivro(),
+            "Você pegou emprestado o livro"+ livro.getTitulo() +" com devolução prevista para " + emprestimo.getDataPrevistaDevolucao()
+        );
 
         return emprestimoRepository.save(emprestimo);
     }
@@ -57,6 +72,24 @@ public class EmprestimoService {
         }
     }
 
+    @Scheduled(cron = "0 0 9 * * ?") // todos os dias às 9h
+    public void verificarDevolucoesProximas() {
+        List<Emprestimo> emprestimos = emprestimoRepository.findAll();
+        LocalDateTime agora = LocalDateTime.now();
+
+        for (Emprestimo e : emprestimos) {
+            if (e.getEstado() == EM_ANDAMENTO) {
+                long dias = ChronoUnit.DAYS.between(agora, e.getDataPrevistaDevolucao());
+                if (dias == 1) {
+                    notificacaoService.notificar(
+                        e.getId(),
+                        e.getIdLivro(),
+                        "A devolução do livro está prevista para amanhã: " + e.getDataPrevistaDevolucao()
+                    );
+                }
+            }
+        }
+    }
 
 
     @Transactional
@@ -80,6 +113,22 @@ public class EmprestimoService {
         } else {
             emprestimo.setMulta(BigDecimal.ZERO);
             emprestimo.setEstado(Emprestimo.EstadoEmprestimo.DEVOLVIDO);
+        }
+        String texto = "Você devolveu o livro " + livro.getTitulo();
+        if (emprestimo.getMulta().compareTo(BigDecimal.ZERO) > 0) {
+            texto += " com multa de R$" + emprestimo.getMulta();
+        }
+        notificacaoService.notificar(emprestimo.getId(), emprestimo.getIdLivro(), texto);
+
+        if (livro.getQtdeLivro() > 0) {
+            List<Estante> desejados = estanteRepository.findByIdLivroAndTipoRelacao(livro.getId_livro(), Estante.TipoRelacao.desejado);
+            for (Estante e : desejados) {
+                notificacaoService.notificar(
+                    e.getId(),
+                    livro.getId_livro(),
+                    "O livro que você desejava está disponível para empréstimo! - " + livro.getTitulo()
+                );
+            }
         }
 
         return emprestimoRepository.save(emprestimo);
