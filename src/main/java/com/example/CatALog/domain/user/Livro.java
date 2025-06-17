@@ -33,11 +33,11 @@ public class Livro {
 
     private String capa;
 
-    private int qtdeLivro;
+    private Integer qtdeLivro;
 
     private Boolean disponibilidade;
 
-    private int numeroPaginas;
+    private Integer numeroPaginas;
 
     @Column(length = 255)
     private String categoria;

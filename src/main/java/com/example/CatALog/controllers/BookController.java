@@ -113,4 +113,24 @@ public class BookController {
             return ResponseEntity.ok("Livro deletado");
         }).orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/disponiveis")
+    public ResponseEntity<Integer> contarDisponiveis() {
+        return ResponseEntity.ok(bookService.contarLivrosDisponiveis());
+    }
+
+    @GetMapping("/buscar/titulo")
+    public ResponseEntity<List<Livro>> buscarPorTitulo(@RequestParam String titulo) {
+        return ResponseEntity.ok(bookService.buscarPorTitulo(titulo));
+    }
+
+    @GetMapping("/buscar/autor")
+    public ResponseEntity<List<Livro>> buscarPorAutor(@RequestParam String autores) {
+        return ResponseEntity.ok(bookService.buscarPorAutor(autores));
+    }
+
+    @GetMapping("/ordenados/autor")
+    public ResponseEntity<List<Livro>> listarPorAutor() {
+        return ResponseEntity.ok(bookService.listarPorAutor());
+    }
 }
