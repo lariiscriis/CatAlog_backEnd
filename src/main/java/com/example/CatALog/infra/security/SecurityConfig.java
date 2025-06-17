@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()//dizendo que esses endpoints não precisam de verficicação
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/user/**").authenticated()
                         .requestMatchers("/api/books/**").permitAll()
                         .anyRequest().authenticated()//e dizendo que qualquer outra requisição a não ser login e register precisa de autenticação
                 )
