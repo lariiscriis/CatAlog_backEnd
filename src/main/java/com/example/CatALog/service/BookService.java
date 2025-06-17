@@ -24,6 +24,30 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
+    public int contarLivrosDisponiveis() {
+        return bookRepository.countLivrosDisponiveis();
+    }
+
+    public List<Livro> listarLivrosDisponiveis() {
+        return bookRepository.findByDisponibilidadeTrue();
+    }
+
+    public List<Livro> buscarPorTitulo(String titulo) {
+        return bookRepository.findByTituloContainingIgnoreCase(titulo);
+    }
+
+    public List<Livro> buscarPorAutor(String autores) {
+        return bookRepository.findByAutoresContainingIgnoreCase(autores);
+    }
+
+    public List<Livro> listarPorAutor() {
+        return bookRepository.listarTodosPorAutor();
+    }
+
+    public List<Livro> buscarLivrosPorAutorOuTitulo(String termo) {
+        return bookRepository.findByTituloContainingIgnoreCaseOrAutoresContainingIgnoreCase(termo, termo);
+    }
+
     public List<Livro> populatePorGenero() throws IOException, InterruptedException {
         List<String> generos = List.of("fantasy", "romance", "science fiction", "history", "biography");
         List<Livro> todos = new ArrayList<>();
