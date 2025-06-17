@@ -32,6 +32,17 @@ public class EmprestimoService {
         this.estanteRepository = estanteRepository;
     }
 
+    public List<Emprestimo> listarTodos() {
+        return emprestimoRepository.findAll();
+    }
+
+    public List<Emprestimo> listarPorUsuario(String idUsuario) {
+        return emprestimoRepository.findById(idUsuario);
+    }
+
+    public List<Emprestimo> listarVencidos() {
+        return emprestimoRepository.findEmprestimosVencidos(LocalDateTime.now());
+    }
 
     @Transactional
     public Emprestimo realizarEmprestimo(Emprestimo emprestimo) {
