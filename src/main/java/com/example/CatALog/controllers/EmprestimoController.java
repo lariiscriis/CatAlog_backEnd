@@ -28,6 +28,11 @@ public class EmprestimoController {
         return ResponseEntity.ok(emprestimoService.listarPorUsuario(idUsuario));
     }
 
+    @GetMapping("/ativos/{idUsuario}")
+    public ResponseEntity<List<Emprestimo>> listarAtivosPorUsuario(@PathVariable String idUsuario) {
+        return ResponseEntity.ok(emprestimoService.listarEmprestimosAtivosPorUsuario(idUsuario));
+    }
+
     // 3. Empréstimos vencidos (atrasados)
     @GetMapping("/vencidos")
     public ResponseEntity<List<Emprestimo>> listarVencidos() {

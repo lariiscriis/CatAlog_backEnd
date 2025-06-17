@@ -30,6 +30,15 @@ public class UserController {
         return ResponseEntity.ok("Sucesso!");
     }
 
+    @GetMapping("/listar/{usuarioAutenticado}")
+    public ResponseEntity<?> listarUsuarios(@PathVariable String usuarioAutenticado) {
+        if (!usuarioAutenticado.equalsIgnoreCase("admin@gmail.com")) {
+            return ResponseEntity.status(403).body("Acesso negado.");
+        }
+
+        return ResponseEntity.ok(userRepository.findAll());
+    }
+
     @GetMapping("/me")
     public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal User user){
         return ResponseEntity.ok(user);
@@ -65,6 +74,24 @@ public class UserController {
 
         userRepository.save(user);
         return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("{emailAdmin}/banir/{email}")
+    public ResponseEntity<?> banirUsuario(
+        @PathVariable String emailAdmin,
+        @PathVariable String email) {
+
+        if (!emailAdmin.equalsIgnoreCase("admin@gmail.com")) {
+            return ResponseEntity.status(403).body("Acesso negado.");
+        }
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+
+        user.setEnabled(false); // Desativa o usuário
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Usuário banido com sucesso.");
     }
 
     @DeleteMapping("{id}")
