@@ -3,18 +3,15 @@ package com.example.CatALog.controllers;
 import com.example.CatALog.domain.user.User;
 import com.example.CatALog.dto.AtualizarUsuarioDTO;
 import com.example.CatALog.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.CatALog.service.ImgurService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -22,9 +19,10 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final ImgurService imgurService;
+    private UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, ImgurService imgurService) {
         this.userRepository = userRepository;
-
+        this.imgurService =  imgurService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -37,29 +35,38 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @Value("${upload.directory:./uploads}")
-    private String uploadDirectory;
-    @PutMapping( "/{email}")
-    public ResponseEntity<?> atualizarPerfil(
-            @PathVariable String email,
-            @RequestBody AtualizarUsuarioDTO dados)
-       {
+    @PutMapping(value = "/{email}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> atualizarPerfilComFoto(
+        @PathVariable String email,
+        @RequestPart("dados") String dadosJson,
+        @RequestPart(value = "fotoPerfil", required = false) MultipartFile fotoPerfil,
+        @RequestPart(value = "fotoBackground", required = false) MultipartFile fotoBackground
+    ) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        AtualizarUsuarioDTO dados = mapper.readValue(dadosJson, AtualizarUsuarioDTO.class);
+        User user = userRepository.findByEmail(email).orElseThrow();
 
-           User user = userRepository.findByEmail(email).orElseThrow();
+        user.setName(dados.getNome());
+        user.setEmail(dados.getEmail());
+        if (dados.getSenha() != null && !dados.getSenha().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(dados.getSenha()));
+        }
+        user.setBio(dados.getBio());
 
-           user.setName(dados.getNome());
-           user.setEmail(dados.getEmail());
-           if (dados.getSenha() != null && !dados.getSenha().isEmpty()) {
-               user.setPassword(passwordEncoder.encode(dados.getSenha())); // HASHEAR A NOVA SENHA
-           }
-           user.setFotoPerfil(dados.getFotoPerfil());
-           user.setFotoBackground(dados.getFotoBackground());
-           user.setBio(dados.getBio());
+        if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
+            String urlPerfil = imgurService.uploadImage(fotoPerfil);
+            user.setFotoPerfil(urlPerfil);
+        }
+
+        if (fotoBackground != null && !fotoBackground.isEmpty()) {
+            String urlBackground = imgurService.uploadImage(fotoBackground);
+            user.setFotoBackground(urlBackground);
+        }
 
         userRepository.save(user);
         return ResponseEntity.ok(user);
-
     }
+
     @DeleteMapping("{id}")
     public ResponseEntity<?> deletaUser(@PathVariable String id) {
         return userRepository.findById(id).map(user -> {
