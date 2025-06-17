@@ -114,10 +114,16 @@ public class BookController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/disponiveis")
+    @GetMapping("/qtdeDisponiveis")
     public ResponseEntity<Integer> contarDisponiveis() {
         return ResponseEntity.ok(bookService.contarLivrosDisponiveis());
     }
+
+    @GetMapping("/disponiveis")
+    public ResponseEntity<List<Livro>> listarLivrosDisponiveis() {
+        return ResponseEntity.ok(bookService.listarLivrosDisponiveis());
+    }
+
 
     @GetMapping("/buscar/titulo")
     public ResponseEntity<List<Livro>> buscarPorTitulo(@RequestParam String titulo) {
@@ -127,6 +133,11 @@ public class BookController {
     @GetMapping("/buscar/autor")
     public ResponseEntity<List<Livro>> buscarPorAutor(@RequestParam String autores) {
         return ResponseEntity.ok(bookService.buscarPorAutor(autores));
+    }
+
+    @GetMapping("/buscar/autorOuTitulo")
+    public ResponseEntity<List<Livro>> buscarLivrosPorAutorOuTitulo(@RequestParam String termo) {
+        return ResponseEntity.ok(bookService.buscarLivrosPorAutorOuTitulo(termo));
     }
 
     @GetMapping("/ordenados/autor")
