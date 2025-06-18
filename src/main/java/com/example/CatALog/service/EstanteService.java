@@ -44,13 +44,13 @@ public class EstanteService {
     }
 
     public void remover(String idUsuario, String idLivro, TipoRelacao tipo) {
-        estanteRepository.findByIdAndLivroIdLivroAndTipoRelacao(idUsuario, idLivro, tipo)
+        estanteRepository.findByIdAndLivro_IdLivroAndTipoRelacao(idUsuario, idLivro, tipo)
             .ifPresent(estanteRepository::delete);
     }
 
     @Transactional
     public Estante atualizarTipoRelacao(String idUsuario, String idLivro, TipoRelacao tipoAtual, TipoRelacao tipoNovo) {
-        Estante estante = estanteRepository.findByIdAndLivroIdLivroAndTipoRelacao(idUsuario, idLivro, tipoAtual)
+        Estante estante = estanteRepository.findByIdAndLivro_IdLivroAndTipoRelacao(idUsuario, idLivro, tipoAtual)
             .orElseThrow(() -> new RuntimeException("Relacionamento não encontrado"));
 
         estante.setTipoRelacao(tipoNovo);

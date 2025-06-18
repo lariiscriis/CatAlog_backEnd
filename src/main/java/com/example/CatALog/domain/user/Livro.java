@@ -44,6 +44,53 @@ public class Livro {
     private String categoria;
 
 
+    public String getIdLivro() {
+        return idLivro;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getEditora() {
+        return editora;
+    }
+
+    public String getData_publicacao() {
+        return data_publicacao;
+    }
+
+    public String getAutores() {
+        return autores;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public String getCapa() {
+        return capa;
+    }
+
+    public Integer getQtdeLivro() {
+        return qtdeLivro;
+    }
+
+    public Boolean getDisponibilidade() {
+        return disponibilidade;
+    }
+
+    public Integer getNumeroPaginas() {
+        return numeroPaginas;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
 // Metodos da classe
 
     public void realizarEmprestimo() {

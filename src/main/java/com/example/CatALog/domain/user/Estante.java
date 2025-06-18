@@ -22,15 +22,33 @@ public class Estante {
     @Column(nullable = false)
     private String id; // user
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_livro", referencedColumnName = "id_livro", nullable = false)
+    @ManyToOne // ou @OneToOne, dependendo da sua relação
+    @JoinColumn(name = "id_livro") // Olhe para 'nullable = false' e o 'name'
     private Livro livro;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private TipoRelacao tipoRelacao;
 
     private LocalDateTime dataInteracao;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setIdLivro(Livro idLivro) {
+        this.livro = idLivro;
+    }
+
+    public void setTipoRelacao(TipoRelacao tipoRelacao) {
+        this.tipoRelacao = tipoRelacao;
+    }
+
+    public void setDataInteracao(LocalDateTime dataInteracao) {
+        this.dataInteracao = dataInteracao;
+    }
+
+
 
     public enum TipoRelacao {
         favorito,
