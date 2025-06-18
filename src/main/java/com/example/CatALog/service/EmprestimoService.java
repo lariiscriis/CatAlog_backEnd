@@ -44,6 +44,11 @@ public class EmprestimoService {
         return emprestimoRepository.findEmprestimosVencidos(LocalDateTime.now());
     }
 
+    public List<Emprestimo> listarEmprestimosAtivosPorUsuario(String idUsuario) {
+        return emprestimoRepository.findByIdAndDataDevolucaoIsNull(idUsuario);
+    }
+
+
     @Transactional
     public Emprestimo realizarEmprestimo(Emprestimo emprestimo) {
         Livro livro = bookRepository.findById(emprestimo.getIdLivro())

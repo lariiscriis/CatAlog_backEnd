@@ -28,6 +28,8 @@ public class User implements UserDetails {
     private String fotoPerfil;
     private String fotoBackground;
     private String bio;
+    private boolean enabled = true; // já existe se usa UserDetails
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -56,8 +58,13 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
 
     // toString para debug
     @Override

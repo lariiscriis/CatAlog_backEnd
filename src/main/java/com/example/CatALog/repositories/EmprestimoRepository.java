@@ -17,6 +17,8 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, Long> {
     @Query("SELECT e FROM Emprestimo e WHERE e.dataPrevistaDevolucao < :agora AND e.dataDevolucao IS NULL AND e.estado = 'EM_ANDAMENTO'")
     List<Emprestimo> findEmprestimosVencidos(@Param("agora") LocalDateTime agora);
 
+    List<Emprestimo> findByIdAndDataDevolucaoIsNull(String idUsuario);
+
     Optional<Emprestimo> findById(Long idEmprestimo);
 
     @Modifying(clearAutomatically = true)
