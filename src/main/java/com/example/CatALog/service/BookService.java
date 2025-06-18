@@ -103,7 +103,7 @@ public class BookService {
 
         for (Livro livro : livros) {
             LivroDTO dto = new LivroDTO();
-            dto.id = String.valueOf(livro.getId_livro());
+            dto.id = String.valueOf(livro.getIdLivro());
 
             LivroDTO.VolumeInfo volumeInfo = new LivroDTO.VolumeInfo();
             volumeInfo.title = livro.getTitulo();

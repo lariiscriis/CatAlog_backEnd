@@ -15,7 +15,8 @@ import lombok.Setter;
 public class Livro {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id_livro;
+    @Column(name = "id_livro")
+    private String idLivro;
 
     private String isbn;
 
@@ -65,7 +66,7 @@ public class Livro {
     @Override
     public String toString() {
         return "Livro{" +
-            "id_livro='" + id_livro + '\'' +
+            "id_livro='" + idLivro + '\'' +
             ", isbn='" + isbn + '\'' +
             ", titulo='" + titulo + '\'' +
             ", editora='" + editora + '\'' +

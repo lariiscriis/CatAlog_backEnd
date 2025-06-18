@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface EstanteRepository extends JpaRepository<Estante, Long> {
     List<Estante> findById(String id);
     List<Estante> findByIdAndTipoRelacao(String id, TipoRelacao tipoRelacao);
-    Optional<Estante> findByIdAndIdLivroAndTipoRelacao(String id, String idLivro, TipoRelacao tipoRelacao);
-    List<Estante> findByIdLivroAndTipoRelacao(String idLivro, TipoRelacao tipoRelacao);
+    Optional<Estante> findByIdAndLivroIdLivroAndTipoRelacao(String id, String idLivro, TipoRelacao tipoRelacao);
+    List<Estante> findByLivroIdLivroAndTipoRelacao(String idLivro, TipoRelacao tipoRelacao);
 
 }

@@ -131,16 +131,16 @@ public class EmprestimoService {
         }
         notificacaoService.notificar(emprestimo.getId(), emprestimo.getIdLivro(), texto);
 
-        if (livro.getQtdeLivro() > 0) {
-            List<Estante> desejados = estanteRepository.findByIdLivroAndTipoRelacao(livro.getId_livro(), Estante.TipoRelacao.desejado);
-            for (Estante e : desejados) {
-                notificacaoService.notificar(
-                    e.getId(),
-                    livro.getId_livro(),
-                    "O livro que você desejava está disponível para empréstimo! - " + livro.getTitulo()
-                );
-            }
-        }
+//        if (livro.getQtdeLivro() > 0) {
+//            List<Estante> desejados = estanteRepository.findByLivroIdLivroAndTipoRelacao(livro.getId_livro(), Estante.TipoRelacao.desejado);
+//            for (Estante e : desejados) {
+//                notificacaoService.notificar(
+//                    e.getId(),
+//                    livro.getId_livro(),
+//                    "O livro que você desejava está disponível para empréstimo! - " + livro.getTitulo()
+//                );
+//            }
+//        }
 
         return emprestimoRepository.save(emprestimo);
     }

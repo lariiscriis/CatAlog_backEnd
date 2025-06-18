@@ -37,6 +37,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/user/**").authenticated()
                         .requestMatchers("/api/books/**").permitAll()
+                        .requestMatchers("/estante/**").permitAll()
+                        .requestMatchers("/api/estantes/**").permitAll()
                         .anyRequest().authenticated()//e dizendo que qualquer outra requisição a não ser login e register precisa de autenticação
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);//adicionao filtro do security filter pra pegar e validar o token do usuario para ser logado

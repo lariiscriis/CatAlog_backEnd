@@ -22,8 +22,9 @@ public class Estante {
     @Column(nullable = false)
     private String id; // user
 
-    @Column(nullable = false)
-    private String idLivro; // livro
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_livro", referencedColumnName = "id_livro", nullable = false)
+    private Livro livro;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
