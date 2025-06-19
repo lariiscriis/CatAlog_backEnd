@@ -102,7 +102,7 @@ git clone https://github.com/lariiscriis/CatAlog_backEnd.git
 cd CatAlog_backEnd
 ```
 2. Compile e rode o projeto clicando no botão de play da IDE ou dando o comando:
-   ```
+```
    ./mvnw spring-boot:run
 ```
 
