@@ -24,12 +24,14 @@ public class EmprestimoService {
     private final BookRepository bookRepository;
     private final NotificacaoService notificacaoService;
     private final EstanteRepository estanteRepository;
+    private final EstanteService estanteService;
 
-    public EmprestimoService(EmprestimoRepository emprestimoRepository, BookRepository bookRepository,NotificacaoService notificacaoService,EstanteRepository estanteRepository) {
+    public EmprestimoService(EstanteService estanteService, EmprestimoRepository emprestimoRepository, BookRepository bookRepository,NotificacaoService notificacaoService,EstanteRepository estanteRepository) {
         this.emprestimoRepository = emprestimoRepository;
         this.bookRepository = bookRepository;
         this.notificacaoService = notificacaoService;
         this.estanteRepository = estanteRepository;
+        this.estanteService = estanteService;
     }
 
     public List<Emprestimo> listarTodos() {
@@ -45,7 +47,12 @@ public class EmprestimoService {
     }
 
     public List<Emprestimo> listarEmprestimosAtivosPorUsuario(String idUsuario) {
-        return emprestimoRepository.findByIdAndDataDevolucaoIsNull(idUsuario);
+        List<Emprestimo> emprestimos = emprestimoRepository.findByIdAndDataDevolucaoIsNull(idUsuario);
+        for (Emprestimo e : emprestimos) {
+            Livro livro = bookRepository.findById(e.getIdLivro()).orElse(null);
+            e.setLivro(livro); // isso pressupõe que Emprestimo tem o campo Livro livro;
+        }
+        return emprestimos;
     }
 
 
@@ -130,24 +137,22 @@ public class EmprestimoService {
             emprestimo.setMulta(BigDecimal.ZERO);
             emprestimo.setEstado(Emprestimo.EstadoEmprestimo.DEVOLVIDO);
         }
+
         String texto = "Você devolveu o livro " + livro.getTitulo();
         if (emprestimo.getMulta().compareTo(BigDecimal.ZERO) > 0) {
             texto += " com multa de R$" + emprestimo.getMulta();
         }
         notificacaoService.notificar(emprestimo.getId(), emprestimo.getIdLivro(), texto);
 
-//        if (livro.getQtdeLivro() > 0) {
-//            List<Estante> desejados = estanteRepository.findByLivroIdLivroAndTipoRelacao(livro.getId_livro(), Estante.TipoRelacao.desejado);
-//            for (Estante e : desejados) {
-//                notificacaoService.notificar(
-//                    e.getId(),
-//                    livro.getId_livro(),
-//                    "O livro que você desejava está disponível para empréstimo! - " + livro.getTitulo()
-//                );
-//            }
-//        }
+        // Remove o livro da estante de emprestado após devolução
+        estanteService.remover(
+            emprestimo.getId(),
+            emprestimo.getIdLivro(),
+            Estante.TipoRelacao.emprestado
+        );
 
         return emprestimoRepository.save(emprestimo);
     }
+
 
 }

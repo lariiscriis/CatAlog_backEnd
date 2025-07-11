@@ -19,7 +19,7 @@ public class StartupRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (bookRepository.count() == 0) {
+        if (bookRepository.count() < 10) {
             System.out.println("Tabela de livros está vazia. Populando livros...");
 
             bookService.populatePorGenero();

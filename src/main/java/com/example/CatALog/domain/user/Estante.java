@@ -22,9 +22,10 @@ public class Estante {
     @Column(nullable = false)
     private String id; // user
 
-    @ManyToOne // ou @OneToOne, dependendo da sua relação
-    @JoinColumn(name = "id_livro") // Olhe para 'nullable = false' e o 'name'
+    @ManyToOne
+    @JoinColumn(name = "id_livro", foreignKey = @ForeignKey(name = "FK_ESTANTE_LIVRO", foreignKeyDefinition = "FOREIGN KEY (id_livro) REFERENCES livro(id_livro) ON DELETE CASCADE"))
     private Livro livro;
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

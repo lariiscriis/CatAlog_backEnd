@@ -11,7 +11,7 @@ public class Emprestimo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEmprestimo;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String id; // user
 
     @Column(nullable = false)
@@ -31,6 +31,16 @@ public class Emprestimo {
     @Column(precision = 10, scale = 2)
     private BigDecimal multa;
 
+    @Transient // se não for mapeado no banco
+    private Livro livro;
+
+    public Livro getLivro() {
+        return livro;
+    }
+
+    public void setLivro(Livro livro) {
+        this.livro = livro;
+    }
     // Getters e Setters
 
     public Long getIdEmprestimo() {
