@@ -29,6 +29,12 @@ public class UserController {
     public ResponseEntity<String> getUser(){
         return ResponseEntity.ok("Sucesso!");
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarUsuarioPorId(@PathVariable String id) {
+        return userRepository.findById(id)
+            .map(user -> ResponseEntity.ok(user))
+            .orElse(ResponseEntity.notFound().build());
+    }
 
     @GetMapping("/listar/{usuarioAutenticado}")
     public ResponseEntity<?> listarUsuarios(@PathVariable String usuarioAutenticado) {
