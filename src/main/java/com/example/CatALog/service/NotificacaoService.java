@@ -5,6 +5,7 @@ import com.example.CatALog.repositories.NotificacaoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class NotificacaoService {
@@ -15,11 +16,12 @@ public class NotificacaoService {
         this.notificacaoRepository = notificacaoRepository;
     }
 
-    public void notificar(String idUser, String idLivro, String texto) {
+    public void notificar(String idUser, String idLivro, String texto, LocalDateTime dataDevolucao) {
         Notificacao notificacao = new Notificacao();
         notificacao.setId(idUser);
         notificacao.setIdLivro(idLivro);
         notificacao.setTexto(texto);
+        notificacao.setDataDevolucao(dataDevolucao);
         notificacao.setDataNotificacao(LocalDateTime.now());
 
         notificacaoRepository.save(notificacao);
