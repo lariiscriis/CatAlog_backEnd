@@ -27,5 +27,7 @@ public class Notificacao {
 
     private String texto ;
 
+    private LocalDateTime dataDevolucao;
+
     private LocalDateTime dataNotificacao;
 }

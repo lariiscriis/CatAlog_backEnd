@@ -64,11 +64,9 @@ public class EmprestimoService {
         livro.realizarEmprestimo();
         bookRepository.save(livro);
 
-        // Se dataEmprestimo vier null, usa agora
         if (emprestimo.getDataEmprestimo() == null) {
             emprestimo.setDataEmprestimo(LocalDateTime.now());
         }
-        // Se dataPrevistaDevolucao vier null, calcula 7 dias após dataEmprestimo
         if (emprestimo.getDataPrevistaDevolucao() == null) {
             emprestimo.setDataPrevistaDevolucao(emprestimo.getDataEmprestimo().plusDays(7));
         }
@@ -76,14 +74,23 @@ public class EmprestimoService {
         emprestimo.setEstado(Emprestimo.EstadoEmprestimo.EM_ANDAMENTO);
         emprestimo.setRenovacoes(0);
         emprestimo.setMulta(BigDecimal.ZERO);
+
         notificacaoService.notificar(
             emprestimo.getId(),
             emprestimo.getIdLivro(),
-            "Você pegou emprestado o livro"+ livro.getTitulo() +" com devolução prevista para " + emprestimo.getDataPrevistaDevolucao()
+            "Você pegou emprestado o livro " + livro.getTitulo(),
+            emprestimo.getDataPrevistaDevolucao()
+        );
+
+        estanteService.remover(
+            emprestimo.getId(),
+            emprestimo.getIdLivro(),
+            Estante.TipoRelacao.desejado
         );
 
         return emprestimoRepository.save(emprestimo);
     }
+
 
 
     @Transactional
@@ -107,7 +114,9 @@ public class EmprestimoService {
                     notificacaoService.notificar(
                         e.getId(),
                         e.getIdLivro(),
-                        "A devolução do livro está prevista para amanhã: " + e.getDataPrevistaDevolucao()
+                        "A devolução do livro está prevista para amanhã" ,
+                        e.getDataPrevistaDevolucao()
+
                     );
                 }
             }
@@ -142,7 +151,7 @@ public class EmprestimoService {
         if (emprestimo.getMulta().compareTo(BigDecimal.ZERO) > 0) {
             texto += " com multa de R$" + emprestimo.getMulta();
         }
-        notificacaoService.notificar(emprestimo.getId(), emprestimo.getIdLivro(), texto);
+        notificacaoService.notificar(emprestimo.getId(), emprestimo.getIdLivro(), texto, emprestimo.getDataDevolucao());
 
         // Remove o livro da estante de emprestado após devolução
         estanteService.remover(
